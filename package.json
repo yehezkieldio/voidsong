@@ -1,13 +1,14 @@
 {
     "name": "voidsong",
     "version": "1.0.0",
-    "module": "src/cli.ts",
+    "module": "dist/cli.js",
     "type": "module",
     "bin": {
-        "voidsong": "src/cli.ts"
+        "voidsong": "dist/cli.js"
     },
     "scripts": {
-        "link": "bun link voidsong"
+        "link": "bun link voidsong",
+        "build": "bun run scripts/build.ts"
     },
     "dependencies": {
         "@clack/prompts": "^0.7.0",
