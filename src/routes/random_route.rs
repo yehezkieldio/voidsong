@@ -3,11 +3,11 @@ use axum::routing::get;
 
 use crate::{
     handlers::{random_humor_handler, random_media_handler, random_trivia_handler},
-    utils::state::AppState,
+    utils::state::AppContext,
 };
 
 pub fn routes() -> Router {
-    let state: AppState = AppState::new();
+    let state: AppContext = AppContext::new();
 
     let trivia = Router::new()
         .route("/fact", get(random_trivia_handler::fact))

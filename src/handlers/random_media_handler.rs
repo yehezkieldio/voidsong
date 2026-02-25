@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::utils::{
     response::{VoidsongError, VoidsongImage},
-    state::{AppState, user_agent},
+    state::{AppContext, user_agent},
     url::{fetch_image, preflight_check},
 };
 
@@ -18,7 +18,7 @@ struct TheCatAPI {
     url: String,
 }
 
-pub async fn cat(State(state): State<AppState>) -> Result<VoidsongImage, VoidsongError> {
+pub async fn cat(State(state): State<AppContext>) -> Result<VoidsongImage, VoidsongError> {
     let urls = [
         "https://cataas.com/cat?json=true",
         "https://api.thecatapi.com/v1/images/search",
@@ -42,7 +42,10 @@ pub async fn cat(State(state): State<AppState>) -> Result<VoidsongImage, Voidson
         },
         "https://api.thecatapi.com/v1/images/search" => {
             match get_url.json::<Vec<TheCatAPI>>().await {
-                Ok(response) => response[0].url.clone(),
+                Ok(response) => match response.into_iter().next() {
+                    Some(image) => image.url,
+                    None => return Err(VoidsongError::FailedToFetchImage),
+                },
                 Err(_) => return Err(VoidsongError::FailedToFetchImage),
             }
         }
@@ -60,7 +63,7 @@ struct DogCEO {
     message: String,
 }
 
-pub async fn dog(State(state): State<AppState>) -> Result<VoidsongImage, VoidsongError> {
+pub async fn dog(State(state): State<AppContext>) -> Result<VoidsongImage, VoidsongError> {
     let urls = ["https://dog.ceo/api/breeds/image/random"];
 
     // Check if the APIs are available
@@ -90,7 +93,7 @@ struct RandomFox {
     image: String,
 }
 
-pub async fn fox(State(state): State<AppState>) -> Result<VoidsongImage, VoidsongError> {
+pub async fn fox(State(state): State<AppContext>) -> Result<VoidsongImage, VoidsongError> {
     let urls = ["https://randomfox.ca/floof"];
 
     // Check if the APIs are available
@@ -125,7 +128,7 @@ struct Media {
     pub poster: String,
 }
 
-pub async fn bunny(State(state): State<AppState>) -> Result<VoidsongImage, VoidsongError> {
+pub async fn bunny(State(state): State<AppContext>) -> Result<VoidsongImage, VoidsongError> {
     let urls = ["https://api.bunnies.io/v2/loop/random/?media=gif,png"];
 
     // Check if the APIs are available
@@ -155,7 +158,7 @@ struct RandomDuck {
     url: String,
 }
 
-pub async fn duck(State(state): State<AppState>) -> Result<VoidsongImage, VoidsongError> {
+pub async fn duck(State(state): State<AppContext>) -> Result<VoidsongImage, VoidsongError> {
     let urls = ["https://random-d.uk/api/v1/random?type=png"];
 
     // Check if the APIs are available

@@ -1,24 +1,24 @@
-use axum::http::HeaderMap;
+use axum::http::{HeaderMap, HeaderValue, header};
 use reqwest::Client;
 
 use crate::env::VERSION;
 
 pub fn user_agent() -> HeaderMap {
     let mut headers = HeaderMap::new();
-    headers.insert(
-        "User-Agent",
-        format!("Voidsong/{}", VERSION).parse().unwrap(),
-    );
+    let user_agent = format!("Voidsong/{VERSION}");
+    let user_agent =
+        HeaderValue::from_str(&user_agent).unwrap_or_else(|_| HeaderValue::from_static("Voidsong"));
+    headers.insert(header::USER_AGENT, user_agent);
 
     headers
 }
 
 #[derive(Clone)]
-pub struct AppState {
+pub struct AppContext {
     pub client: Client,
 }
 
-impl AppState {
+impl AppContext {
     pub fn new() -> Self {
         Self {
             client: Client::new(),
@@ -26,7 +26,7 @@ impl AppState {
     }
 }
 
-impl Default for AppState {
+impl Default for AppContext {
     fn default() -> Self {
         Self::new()
     }

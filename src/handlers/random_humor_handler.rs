@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::utils::{
     response::{VoidsongError, VoidsongHumor},
-    state::{AppState, user_agent},
+    state::{AppContext, user_agent},
     url::preflight_check,
 };
 
@@ -13,7 +13,7 @@ struct ChuckNorrisFact {
     value: String,
 }
 
-pub async fn chuck_norris(State(state): State<AppState>) -> Result<VoidsongHumor, VoidsongError> {
+pub async fn chuck_norris(State(state): State<AppContext>) -> Result<VoidsongHumor, VoidsongError> {
     let urls = ["https://api.chucknorris.io/jokes/random"];
 
     // Check if the APIs are available
@@ -42,7 +42,7 @@ struct ICanHazDadJoke {
     joke: String,
 }
 
-pub async fn dad_joke(State(state): State<AppState>) -> Result<VoidsongHumor, VoidsongError> {
+pub async fn dad_joke(State(state): State<AppContext>) -> Result<VoidsongHumor, VoidsongError> {
     let urls = ["https://icanhazdadjoke.com"];
 
     // Check if the APIs are available

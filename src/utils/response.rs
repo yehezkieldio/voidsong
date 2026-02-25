@@ -1,5 +1,6 @@
 use std::pin::Pin;
 
+use axum::Json;
 use axum::body::Body;
 use axum::http::{HeaderName, StatusCode, header};
 use axum::response::{IntoResponse, Response};
@@ -55,14 +56,11 @@ pub struct VoidsongHumor {
 impl IntoResponse for VoidsongHumor {
     fn into_response(self) -> Response {
         let headers = [
-            (header::CONTENT_TYPE, "application/json"),
             (header::CACHE_CONTROL, "no-cache"),
             (HeaderName::from_static("x-voidsong-version"), VERSION),
         ];
 
-        let body = serde_json::to_string(&self).unwrap();
-
-        (StatusCode::OK, headers, body).into_response()
+        (StatusCode::OK, headers, Json(self)).into_response()
     }
 }
 
@@ -76,14 +74,11 @@ pub struct VoidsongTrivia {
 impl IntoResponse for VoidsongTrivia {
     fn into_response(self) -> Response {
         let headers = [
-            (header::CONTENT_TYPE, "application/json"),
             (header::CACHE_CONTROL, "no-cache"),
             (HeaderName::from_static("x-voidsong-version"), VERSION),
         ];
 
-        let body = serde_json::to_string(&self).unwrap();
-
-        (StatusCode::OK, headers, body).into_response()
+        (StatusCode::OK, headers, Json(self)).into_response()
     }
 }
 

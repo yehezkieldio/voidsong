@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::utils::{
     response::{VoidsongError, VoidsongTrivia},
-    state::{AppState, user_agent},
+    state::{AppContext, user_agent},
     url::preflight_check,
 };
 
@@ -13,7 +13,7 @@ struct NekosLifeFact {
     fact: String,
 }
 
-pub async fn fact(State(state): State<AppState>) -> Result<VoidsongTrivia, VoidsongError> {
+pub async fn fact(State(state): State<AppContext>) -> Result<VoidsongTrivia, VoidsongError> {
     let urls = ["https://nekos.life/api/v2/fact"];
 
     // Check if the APIs are available
@@ -42,7 +42,7 @@ struct CatFactNinja {
     fact: String,
 }
 
-pub async fn cat_fact(State(state): State<AppState>) -> Result<VoidsongTrivia, VoidsongError> {
+pub async fn cat_fact(State(state): State<AppContext>) -> Result<VoidsongTrivia, VoidsongError> {
     let urls = ["https://catfact.ninja/fact"];
 
     // Check if the APIs are available
@@ -71,7 +71,7 @@ pub struct DogAPIKindUff {
     facts: Vec<String>,
 }
 
-pub async fn dog_fact(State(state): State<AppState>) -> Result<VoidsongTrivia, VoidsongError> {
+pub async fn dog_fact(State(state): State<AppContext>) -> Result<VoidsongTrivia, VoidsongError> {
     let urls = ["https://dog-api.kinduff.com/api/facts?number=1"];
 
     // Check if the APIs are available
@@ -86,7 +86,10 @@ pub async fn dog_fact(State(state): State<AppState>) -> Result<VoidsongTrivia, V
     };
 
     let fact: String = match get_url.json::<DogAPIKindUff>().await {
-        Ok(response) => response.facts[0].clone(),
+        Ok(response) => match response.facts.into_iter().next() {
+            Some(fact) => fact,
+            None => return Err(VoidsongError::FailedToFetchContent),
+        },
         Err(_) => return Err(VoidsongError::FailedToFetchContent),
     };
 
