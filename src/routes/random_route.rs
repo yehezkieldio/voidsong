@@ -1,5 +1,5 @@
-use axum::routing::get;
 use axum::Router;
+use axum::routing::get;
 
 use crate::{
     handlers::{random_humor_handler, random_media_handler, random_trivia_handler},
@@ -28,10 +28,8 @@ pub fn routes() -> Router {
         .route("/duck", get(random_media_handler::duck))
         .with_state(state.clone());
 
-    let router = Router::new()
+    Router::new()
         .nest("/trivia", trivia)
         .nest("/media", media)
-        .nest("/humor", humor);
-
-    router
+        .nest("/humor", humor)
 }

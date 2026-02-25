@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::utils::{
     response::{VoidsongError, VoidsongTrivia},
-    state::{user_agent, AppState},
+    state::{AppState, user_agent},
     url::preflight_check,
 };
 
@@ -14,22 +14,15 @@ struct NekosLifeFact {
 }
 
 pub async fn fact(State(state): State<AppState>) -> Result<VoidsongTrivia, VoidsongError> {
-    let urls: Vec<&str> = vec!["https://nekos.life/api/v2/fact"];
+    let urls = ["https://nekos.life/api/v2/fact"];
 
     // Check if the APIs are available
-    let (success, url) = preflight_check(&state.client, urls).await;
-    if !success {
+    let Some(url) = preflight_check(&state.client, &urls).await else {
         return Err(VoidsongError::ServiceUnavailable);
-    }
+    };
 
     // Get the image URL
-    let get_url: Response = match state
-        .client
-        .get(url.unwrap())
-        .headers(user_agent())
-        .send()
-        .await
-    {
+    let get_url: Response = match state.client.get(url).headers(user_agent()).send().await {
         Ok(response) => response,
         Err(_) => return Err(VoidsongError::FailedToFetchContent),
     };
@@ -50,22 +43,15 @@ struct CatFactNinja {
 }
 
 pub async fn cat_fact(State(state): State<AppState>) -> Result<VoidsongTrivia, VoidsongError> {
-    let urls: Vec<&str> = vec!["https://catfact.ninja/fact"];
+    let urls = ["https://catfact.ninja/fact"];
 
     // Check if the APIs are available
-    let (success, url) = preflight_check(&state.client, urls).await;
-    if !success {
+    let Some(url) = preflight_check(&state.client, &urls).await else {
         return Err(VoidsongError::ServiceUnavailable);
-    }
+    };
 
     // Get the image URL
-    let get_url: Response = match state
-        .client
-        .get(url.unwrap())
-        .headers(user_agent())
-        .send()
-        .await
-    {
+    let get_url: Response = match state.client.get(url).headers(user_agent()).send().await {
         Ok(response) => response,
         Err(_) => return Err(VoidsongError::FailedToFetchContent),
     };
@@ -86,22 +72,15 @@ pub struct DogAPIKindUff {
 }
 
 pub async fn dog_fact(State(state): State<AppState>) -> Result<VoidsongTrivia, VoidsongError> {
-    let urls: Vec<&str> = vec!["https://dog-api.kinduff.com/api/facts?number=1"];
+    let urls = ["https://dog-api.kinduff.com/api/facts?number=1"];
 
     // Check if the APIs are available
-    let (success, url) = preflight_check(&state.client, urls).await;
-    if !success {
+    let Some(url) = preflight_check(&state.client, &urls).await else {
         return Err(VoidsongError::ServiceUnavailable);
-    }
+    };
 
     // Get the image URL
-    let get_url: Response = match state
-        .client
-        .get(url.unwrap())
-        .headers(user_agent())
-        .send()
-        .await
-    {
+    let get_url: Response = match state.client.get(url).headers(user_agent()).send().await {
         Ok(response) => response,
         Err(_) => return Err(VoidsongError::FailedToFetchContent),
     };

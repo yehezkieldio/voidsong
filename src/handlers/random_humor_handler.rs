@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 use crate::utils::{
     response::{VoidsongError, VoidsongHumor},
-    state::{user_agent, AppState},
+    state::{AppState, user_agent},
     url::preflight_check,
 };
 
@@ -14,22 +14,15 @@ struct ChuckNorrisFact {
 }
 
 pub async fn chuck_norris(State(state): State<AppState>) -> Result<VoidsongHumor, VoidsongError> {
-    let urls: Vec<&str> = vec!["https://api.chucknorris.io/jokes/random"];
+    let urls = ["https://api.chucknorris.io/jokes/random"];
 
     // Check if the APIs are available
-    let (success, url) = preflight_check(&state.client, urls).await;
-    if !success {
+    let Some(url) = preflight_check(&state.client, &urls).await else {
         return Err(VoidsongError::ServiceUnavailable);
-    }
+    };
 
     // Get the image URL
-    let get_url: Response = match state
-        .client
-        .get(url.unwrap())
-        .headers(user_agent())
-        .send()
-        .await
-    {
+    let get_url: Response = match state.client.get(url).headers(user_agent()).send().await {
         Ok(response) => response,
         Err(_) => return Err(VoidsongError::FailedToFetchContent),
     };
@@ -50,22 +43,15 @@ struct ICanHazDadJoke {
 }
 
 pub async fn dad_joke(State(state): State<AppState>) -> Result<VoidsongHumor, VoidsongError> {
-    let urls: Vec<&str> = vec!["https://icanhazdadjoke.com"];
+    let urls = ["https://icanhazdadjoke.com"];
 
     // Check if the APIs are available
-    let (success, url) = preflight_check(&state.client, urls).await;
-    if !success {
+    let Some(url) = preflight_check(&state.client, &urls).await else {
         return Err(VoidsongError::ServiceUnavailable);
-    }
+    };
 
     // Get the image URL
-    let get_url: Response = match state
-        .client
-        .get(url.unwrap())
-        .headers(user_agent())
-        .send()
-        .await
-    {
+    let get_url: Response = match state.client.get(url).headers(user_agent()).send().await {
         Ok(response) => response,
         Err(_) => return Err(VoidsongError::FailedToFetchContent),
     };

@@ -5,26 +5,23 @@ use bytes::Bytes;
 use futures_util::{Stream, StreamExt};
 use reqwest::Client;
 
-pub async fn preflight_check<'a>(
-    client: &'a Client,
-    urls: Vec<&'a str>,
-) -> (bool, Option<&'a str>) {
-    for url in urls {
+pub async fn preflight_check<'a>(client: &Client, urls: &'a [&'a str]) -> Option<&'a str> {
+    for &url in urls {
         let response = client.head(url).headers(user_agent()).send().await;
 
         match response {
             Ok(response) => {
                 if response.status().is_success() {
-                    return (true, Some(url));
+                    return Some(url);
                 }
             }
             Err(_) => continue,
         }
     }
-    (false, None)
+    None
 }
 
-pub async fn fetch_image<'a>(client: &'a Client, url: &str) -> Option<VoidsongImage> {
+pub async fn fetch_image(client: &Client, url: &str) -> Option<VoidsongImage> {
     let response = client.get(url).headers(user_agent()).send().await;
 
     match response {

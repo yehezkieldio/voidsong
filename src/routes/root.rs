@@ -1,18 +1,17 @@
 use axum::Router;
 use tower_http::{
     compression::CompressionLayer,
-    normalize_path::{NormalizePath, NormalizePathLayer},
+    normalize_path::NormalizePathLayer,
     trace::{self, TraceLayer},
 };
-use tower_layer::Layer;
 use tracing::Level;
 
 use crate::utils::response::VoidsongError;
 
 use super::random_route;
 
-pub fn routes() -> NormalizePath<Router> {
-    let app_router = Router::new()
+pub fn routes() -> Router {
+    Router::new()
         .nest("/random", random_route::routes())
         .fallback(handler_404)
         .layer(
@@ -20,9 +19,8 @@ pub fn routes() -> NormalizePath<Router> {
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
                 .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
         )
-        .layer(CompressionLayer::new());
-
-    NormalizePathLayer::trim_trailing_slash().layer(app_router)
+        .layer(CompressionLayer::new())
+        .layer(NormalizePathLayer::trim_trailing_slash())
 }
 
 async fn handler_404() -> VoidsongError {
