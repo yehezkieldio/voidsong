@@ -1,55 +1,111 @@
-![Banner](assets/banner.png)
+<div align="center">
+<img src="assets/avatar.png" align="center" width="120px" height="120px" />
+<h3>Voidsong</h3>
+<p>Self-hosted random content API for media, trivia, and humor</p>
 
-## Voidsong
+<a href="https://github.com/yehezkieldio/voidsong/releases"><img src="https://img.shields.io/github/v/release/yehezkieldio/voidsong?style=flat&labelColor=1C2C2E&color=C96329&logo=GitHub&logoColor=white"></a>
+<a href="https://github.com/yehezkieldio/voidsong/pkgs/container/voidsong"><img src="https://img.shields.io/github/actions/workflow/status/yehezkieldio/voidsong/release.yml?style=flat&labelColor=1C2C2E&color=C96329&label=docker&logo=Docker&logoColor=white"></a>
+</div>
 
-Voidsong is a versatile, self-hosted API aggregator designed to streamline your interaction with various APIs by providing a unified endpoint for all your content needs. Whether you're looking for random images, trivia facts, or jokes. It serves as a reliable intermediary, fetching and delivering content seamlessly from multiple external APIs.
+---
 
-The project is written in Rust, using the [Axum](https://github.com/tokio-rs/axum) web framework.
+Voidsong is a lightweight API aggregator written in Rust with [Axum](https://github.com/tokio-rs/axum).  
+It exposes stable endpoints for random animal media, trivia facts, and jokes while handling upstream API fetches behind a single base URL.
 
-### Building and Running
+## Features
 
-You can start the service by building the project and running the binary, with the following command:
+- **Single API surface**: one service with grouped routes under `/random`.
+- **Upstream availability preflight**: handlers check source health before fetching data.
+- **Streaming media responses**: image endpoints stream bytes directly with the original content type.
+- **Consistent response headers**: includes `x-voidsong-version` and `cache-control: no-cache`.
+- **Container-ready runtime**: multi-stage Docker build with non-root runtime user.
 
-> **Note:** Make sure you have Rust installed on your system. You can install it from [rust-lang.org](https://www.rust-lang.org/).
+## API Routes
 
-```bash
+### Media
+
+- `GET /random/media/cat`
+- `GET /random/media/dog`
+- `GET /random/media/fox`
+- `GET /random/media/bunny`
+- `GET /random/media/duck`
+
+### Trivia
+
+- `GET /random/trivia/fact`
+- `GET /random/trivia/catfact`
+- `GET /random/trivia/dogfact`
+
+### Humor
+
+- `GET /random/humor/chucknorris`
+- `GET /random/humor/dadjoke`
+
+## Building from Source
+
+### Prerequisites
+
+- [Rust stable](https://rustup.rs/)
+- `cargo-nextest` (for `just test`)
+- [`just`](https://just.systems/) (optional, for convenience commands)
+
+### Build and run
+
+```sh
+git clone https://github.com/yehezkieldio/voidsong.git
+cd voidsong
 cargo run --release
 ```
 
-By default, the service will be available at `http://localhost:8080`, you can change the port by setting an environment variable file named `.env` with the following content:
+The service listens on `0.0.0.0:8080` by default.
+
+## Configuration
+
+Configuration is loaded from `.env` and process environment variables.
+
+| Variable      | Default   | Description            |
+| ------------- | --------- | ---------------------- |
+| `SERVER_HOST` | `0.0.0.0` | Bind address           |
+| `SERVER_PORT` | `8080`    | Bind port              |
+| `RUST_LOG`    | `info`    | Logging verbosity      |
+
+Example `.env`:
 
 ```env
-SERVER_HOST=127.0.0.1
+SERVER_HOST=0.0.0.0
 SERVER_PORT=8080
+RUST_LOG=info
 ```
 
-### API Routes
+## Docker
 
-#### Media
+Build the production runtime image locally:
 
-These routes return random images of animals.
+```sh
+docker build --target runtime -t voidsong:latest .
+```
 
-- `GET /random/media/cat` - Returns a random cat image.
-- `GET /random/media/dog` - Returns a random dog image.
-- `GET /random/media/fox` - Returns a random fox image.
-- `GET /random/media/bunny` - Returns a random bunny image.
-- `GET /random/media/duck` - Returns a random duck image.
+Run it:
 
-#### Trivia
+```sh
+docker run --rm -p 8080:8080 \
+  -e SERVER_HOST=0.0.0.0 \
+  -e SERVER_PORT=8080 \
+  -e RUST_LOG=info \
+  voidsong:latest
+```
 
-These routes return random trivia facts.
+Published images are available from GHCR: `ghcr.io/<owner>/voidsong:<tag>`.
 
-- `GET /random/trivia/fact` - Returns a random trivia fact.
-- `GET /random/trivia/catfact` - Returns a random cat fact.
-- `GET /random/trivia/dogfact` - Returns a random dog fact.
+## Development
 
-#### Humor
+```sh
+just check
+just clippy
+just test --no-tests=pass
+just fmt
+```
 
-These routes return random jokes.
+## License
 
-- `GET /random/humor/chucknorris` - Returns a random Chuck Norris joke.
-- `GET /random/humor/dadjoke` - Returns a random dad joke.
-
-### License
-
-This project is proudly provided under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
