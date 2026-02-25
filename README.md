@@ -1,4 +1,4 @@
-![Banner](.github/assets/banner.png)
+![Banner](assets/banner.png)
 
 ## Voidsong
 

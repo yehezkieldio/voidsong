@@ -1,21 +1,13 @@
-# cargo-features = ["codegen-backend"]
-
-[profile.dev]
-# codegen-backend = "cranelift"
-incremental = true
-opt-level = 0
-debug = true
-
-[[bin]]
-name = "voidsong"
-path = "src/main.rs"
-
 [package]
 name = "voidsong"
 version = "1.1.0"
 edition = "2024"
 rust-version = "1.85"
 publish = false
+
+[[bin]]
+name = "voidsong"
+path = "src/main.rs"
 
 [dependencies]
 axum = "0.8.8"
@@ -33,3 +25,8 @@ tower-http = { version = "0.6.8", features = [
 ] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
+
+[profile.dev]
+incremental = true
+opt-level = 0
+debug = true
